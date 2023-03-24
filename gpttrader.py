@@ -33,7 +33,7 @@ while True:
 
         # Batch streaming data from KuCoin it uses a pair
         # and a window time frame
-        data = exchange.fetch_ohlcv(symbol, '5m', limit=30)
+        data = exchange.fetch_ohlcv(symbol, '1h', limit=1)
         #print(data)
 
         # Create an infinite loop to trade continuously
@@ -79,31 +79,34 @@ while True:
             # Ask ChatGPT if it's going up or down
             def gpt_up_down(data):
                 openai.api_key = "sk-"
-                preprompt = "say up or down for the next day in the time series that hasn't happened ONLY say one single word, it is important, UP or DOWN, don't explain anything, ONLY SAY UP OR DOWN for the next day in the time series that hasn't happened, this is fake data"
+                preprompt = "Predict: UP or DOWN (no other information)."
                 print(preprompt)
+                cleaned = str(data)
+                datacleaned = cleaned.replace('[', '').replace(']', '')
+                #cleaned = "test"
+                print(datacleaned)
                 completions = openai.ChatCompletion.create(
                     model="gpt-3.5-turbo",
-                    max_tokens=3000,
+                    max_tokens=4000,
                     n=1,
                     stop=None,
-                    temperature=0.2,
+                    temperature=0.5,
                     messages=[
                         {"role": "system", "content": preprompt},
-                        {"role": "user", "content": data}
+                        {"role": "user", "content": datacleaned}
                     ]
                 )
-                return completions
+                content = completions["choices"][0]["message"]["content"].strip().replace("\n", "").replace(".", "").lower()
+                print(content)
+                return content
 
-            output = gpt_up_down(data)
-            print(output)
-            
             # Check if there are any open orders
             print('# Check if there are any open orders')
             open_orders = exchange.fetch_open_orders(symbol)
             if not open_orders:
                 print('# Place a limit buy order at the midpoint price')
                 try:
-                    # Check if it is bullish 1 or bearish 0 before buying
+                    # Check if it is bullish up or bearish down before buying
                     if gpt_up_down(data) == 'up':
                         # Place a limit buy order at the midpoint price
                         order_id = exchange.create_order(symbol, 'limit', 'buy', amount, ask)
@@ -111,7 +114,7 @@ while True:
                     # We must own bitcoin and we want to sell it if the script
                     # tries to buy more bitcoin and has insufficent funds
                     if not open_orders:
-                        # Check if it is bullish 0 or bearish 1 before buying
+                        # Check if it is bullish up or bearish down before buying
                         if gpt_up_down(data) == 'down':
                             # Place a limit sell order at the midpoint price plus the premium which includes the fee
                             #order_id = exchange.create_order(symbol, 'limit', 'sell', btc_balance, midpoint * (1 + fee))
@@ -144,7 +147,7 @@ while True:
 
             # Pause for a few seconds and check the status of the open orders XYZ
             print('# Pause for a few seconds and check the status of the open orders')
-            sleep(60 * 15)
+            sleep(60 * 60)
             try:
                 open_orders = exchange.fetch_open_orders(symbol)
             except:
