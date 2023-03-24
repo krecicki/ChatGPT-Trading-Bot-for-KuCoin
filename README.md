@@ -1,4 +1,5 @@
-# CHATGPT Crypto Trading Bot | Python Script for KuCoin by Cody Krecicki
+# CHATGPT Crypto Trading Bot
+### Python Script for KuCoin by Cody Krecicki
 ### Author: https://twitter.com/krecicki
 
 ### STATUS: WORKING - CAN ONLY USE 1 period for prediciton. The API will not accept 2 or more parts of the time series. Maybe someone can hack around this.
