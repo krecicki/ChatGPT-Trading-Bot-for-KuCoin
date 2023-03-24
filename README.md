@@ -1,3 +1,5 @@
+Vote for us: https://www.producthunt.com/posts/chatgpt-crypto-trader-script and join the community.
+
 # CHATGPT Crypto Trading Bot
 ### Python Script for KuCoin by Cody Krecicki
 ### Author: https://twitter.com/krecicki
